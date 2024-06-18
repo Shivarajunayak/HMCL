@@ -1,0 +1,141 @@
+trigger:
+- DEV
+- UAT
+- main
+
+variables:
+- group: AzureDevopsCredsLibrary-DEV
+
+pool:
+  # vmImage: ubuntu-latest
+  name: eks-linux-pool
+
+steps:
+  - checkout: self
+    path: self
+  - bash: |
+      echo 'Installing TFLINT'
+      curl -s https://raw.githubusercontent.com/terraform-linters/tflint/master/install_linux.sh | bash
+      echo 'Initiating TFLint scan'
+      pwd
+      mkdir -p $(System.DefaultWorkingDirectory)/tflint
+      cd $(System.DefaultWorkingDirectory)/$(TARGET_NONPROD_ACCOUNT)/$(AWS_REGION)  
+      tflint --init
+      tflint --recursive --format junit > $(System.DefaultWorkingDirectory)/tflint/tflint-scan.xml
+      find $(System.DefaultWorkingDirectory) -type f -name tflint-scan.xml
+    displayName: 'Installing TFLINT'
+    condition: eq(variables['Build.SourceBranch'], 'refs/heads/DEV')
+
+  - task: InstallSSHKey@0
+    inputs:
+      sshKeySecureFile: 'id_rsa'
+      knownHostsEntry: '$(TERRAGRUNT_KNOWN_HOSTS)'
+
+  - task: PublishTestResults@2
+    displayName: 'Publish TFlint Test Results **/tflint-scan.xml'
+    inputs:
+      testResultsFiles: '**/tflint-scan.xml'
+      searchFolder: '$(System.DefaultWorkingDirectory)/tflint'
+      failTaskOnFailureToPublishResults: true
+      failTaskOnMissingResultsFile: true
+      testRunTitle: 'Publish TFlint Test Results'
+    condition: eq(variables['Build.SourceBranch'], 'refs/heads/DEV')
+
+  - task: SonarQubePrepare@5
+    displayName: 'Prepare SonarQube Analysis'
+    inputs:
+      SonarQube: 'sc-sq-thor-infra-dev-terragrunt'
+      scannerMode: 'CLI'
+      configMode: 'manual'
+      cliProjectKey: '$(SONAR_PROJ_KEY)'
+      cliProjectName: 'thor-infra-dev-terragrunt'
+      cliSources: '$(System.DefaultWorkingDirectory)'
+      extraProperties: |
+        sonar.projectKey=$(SONAR_PROJ_KEY)
+        sonar.projectName=thor-infra-dev-terragrunt
+        sonar.sources=$(System.DefaultWorkingDirectory)
+    condition: eq(variables['Build.SourceBranch'], 'refs/heads/DEV')
+
+  - task: SonarQubeAnalyze@5
+    displayName: 'Run SonarQube Analysis'
+    inputs:
+      jdkversion: 'JAVA_HOME_17_X64'
+    condition: eq(variables['Build.SourceBranch'], 'refs/heads/DEV')
+
+  - bash: |
+      echo 'Prepare Checkov and Run Checkov Scan'
+      echo 'Initiating Checkov installation'
+      echo 'Current directory path'
+      pwd
+      pip install checkov
+      mkdir -p $(System.DefaultWorkingDirectory)/checkov-report
+      cd $(System.DefaultWorkingDirectory)/checkov-report
+      checkov --directory $(System.DefaultWorkingDirectory) --output junitxml > $(System.DefaultWorkingDirectory)/checkov-report/TEST-checkov-report.xml
+      pwd
+      exit 0
+    displayName: 'Prepare Checkov and Run Checkov Scan'
+    condition: eq(variables['Build.SourceBranch'], 'refs/heads/DEV')
+
+  - task: PublishTestResults@2
+    displayName: 'Publish Checkov Scan Results **/TEST-*.xml'
+    inputs:
+      testResultsFiles: '**/TEST-*.xml'
+      searchFolder: '$(System.DefaultWorkingDirectory)/checkov-report'
+      mergeTestResults: true
+    condition: eq(variables['Build.SourceBranch'], 'refs/heads/DEV')
+
+  # - checkout: git://CVPI - Thor Infra DevOps/thor-infra-terraform-modules # Azure Repos Git repository in the same organization
+  #   path: folder/modules
+
+  - task: TerraformInstaller@1
+    condition: |
+      or(eq(variables['Build.SourceBranch'], 'refs/heads/UAT'), eq(variables['Build.SourceBranch'], 'refs/heads/main'))
+    inputs:
+      terraformVersion: '$(TERRAFORM_VERSION)'
+
+  - task: Install Terragrunt@0
+    condition: |
+      or(eq(variables['Build.SourceBranch'], 'refs/heads/UAT'), eq(variables['Build.SourceBranch'], 'refs/heads/main'))
+    inputs:
+      terragruntversion: '$(TERRAGRUNT_VERSION)'
+    
+  - bash: |
+      echo 'Prepare Terragrunt ENV'
+      chmod u+x /usr/local/bin/terragrunt && ls -l /usr/local/bin/terragrunt
+      cd ../
+    displayName: 'Prepare Terragrunt ENV'
+    condition: |
+      or(eq(variables['Build.SourceBranch'], 'refs/heads/UAT'), eq(variables['Build.SourceBranch'], 'refs/heads/main'))
+
+
+  - task: Bash@3
+    displayName: 'Run Terragrunt run-all Init'
+    condition: |
+      or(eq(variables['Build.SourceBranch'], 'refs/heads/UAT'), eq(variables['Build.SourceBranch'], 'refs/heads/main'))
+    inputs:
+      targetType: 'inline'
+      script: |
+        pwd ; ls -l
+        cd "$(Agent.BuildDirectory)/self/$(TARGET_NONPROD_ACCOUNT)/$(AWS_REGION)"
+        pwd ; ls -l
+        terragrunt run-all init --terragrunt-source-update --terragrunt-debug 2>&1
+
+  - task: Bash@3
+    displayName: 'Run Terragrunt run-all plan'
+    condition: |
+      or(eq(variables['Build.SourceBranch'], 'refs/heads/UAT'), eq(variables['Build.SourceBranch'], 'refs/heads/main'))
+    inputs:
+      targetType: 'inline'
+      script: |
+        cd "$(Agent.BuildDirectory)/self/$(TARGET_NONPROD_ACCOUNT)/$(AWS_REGION)"
+        terragrunt run-all plan
+
+
+  - task: Bash@3
+    displayName: 'Run Terragrunt run-all apply'
+    condition: eq(variables['Build.SourceBranch'], 'refs/heads/main')
+    inputs:
+      targetType: 'inline'
+      script: |
+        cd "$(Agent.BuildDirectory)/self/$(TARGET_NONPROD_ACCOUNT)/$(AWS_REGION)"
+        terragrunt run-all apply --terragrunt-non-interactive

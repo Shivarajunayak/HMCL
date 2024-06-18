@@ -1,0 +1,348 @@
+# ---------------------------------------------------------------------------------------------------------------------
+# TERRAGRUNT CONFIGURATION
+# This is the configuration for Terragrunt, a thin wrapper for Terraform and OpenTofu that helps keep your code DRY and
+# maintainable: https://github.com/gruntwork-io/terragrunt
+# ---------------------------------------------------------------------------------------------------------------------
+
+# Include the root `terragrunt.hcl` configuration. The root configuration contains settings that are common across all
+# components and environments, such as how to configure remote state.
+
+include "root" {
+  path = find_in_parent_folders()
+}
+
+
+# Configure the version of the module to use in this environment. This allows you to promote new versions one
+# environment at a time (e.g., qa -> stage -> prod).
+
+terraform {
+  source = "git@ssh.dev.azure.com:v3/hero-ev-team/CVPI%20-%20Thor%20Infra%20DevOps/thor-infra-terraform-modules//modules/iot/iot-decoder-manifest?ref=feature_iot"
+}
+
+locals {
+  # Automatically load account-level variables
+  account_vars = read_terragrunt_config(find_in_parent_folders("account.hcl"))
+
+  # Automatically load region-level variables
+  region_vars = read_terragrunt_config(find_in_parent_folders("region.hcl"))
+
+  # Automatically load environment-level variables
+  environment_vars = read_terragrunt_config(find_in_parent_folders("env.hcl"))
+
+
+
+  # Extract the variables we need for easy access
+
+  aws_account_id   = local.account_vars.locals.aws_account_id
+  aws_account_name = local.account_vars.locals.account_name
+  aws_region       = local.region_vars.locals.aws_region
+  aws_region_short = local.region_vars.locals.aws_region_short
+  sso_region       = local.region_vars.locals.sso_region
+  deployment_role  = local.account_vars.locals.deployment_role
+  environment      = local.environment_vars.locals.environment
+
+}
+
+
+# Inputs to the source Terraform module
+
+inputs = {
+
+  fleetwise_endpoint_url = "https://controlplane.us-west-2.gamma.kaleidoscope.iot.aws.dev"
+  aws_region             = "${local.aws_region}"
+  terraform_role_arn     = "arn:aws:iam::${local.aws_account_id}:role/${local.deployment_role}"
+
+  decoder_manifest_json = {
+    "name" : "hmcl-cv-nonprod-decoder-manifest",
+    "modelManifestArn" : "arn:aws:iotfleetwise:us-west-2:905418263290:model-manifest/DEFAULT_MODEL",
+    "description" : "AWS IoT FleetWise Training Decoder Manifest",
+    "networkInterfaces" : [
+      {
+        "canInterface" : {
+          "name" : "vcan0",
+          "protocolName" : "CAN",
+          "protocolVersion" : "2.0b"
+        },
+        "interfaceId" : "1",
+        "type" : "CAN_INTERFACE"
+      }
+    ],
+
+    "signalDecoders": [
+        {
+            "fullyQualifiedName": "TestVehicle.Chassis.Accelerator.PedalPosition",
+            "type": "CAN_SIGNAL",
+            "interfaceId": "1",
+            "canSignal": {
+                "messageId": 202,
+                "isBigEndian": false,
+                "isSigned": false,
+                "startBit": 0,
+                "offset": 0.0,
+                "factor": 1.0,
+                "length": 24,
+                "name": "AccPedPosnVcu"
+            }
+        },
+        {
+            "fullyQualifiedName": "TestVehicle.Chassis.Brake.PedalPosition",
+            "type": "CAN_SIGNAL",
+            "interfaceId": "1",
+            "canSignal": {
+                "messageId": 102,
+                "isBigEndian": false,
+                "isSigned": false,
+                "startBit": 0,
+                "offset": 0.0,
+                "factor": 1.0,
+                "length": 24,
+                "name": "BrkPressState"
+            }
+			},
+        {
+            "fullyQualifiedName": "TestVehicle.CurrentLocation.Latitude",
+            "type": "CAN_SIGNAL",
+            "interfaceId": "1",
+            "canSignal": {
+                "messageId": 602,
+                "isBigEndian": false,
+                "isSigned": false,
+                "startBit": 0,
+                "offset": 0.0,
+                "factor": 1.0,
+                "length": 64,
+                "name": "Latitude"
+            }
+        },
+        {
+            "fullyQualifiedName": "TestVehicle.CurrentLocation.Longitude",
+            "type": "CAN_SIGNAL",
+            "interfaceId": "1",
+            "canSignal": {
+                "messageId": 601,
+                "isBigEndian": false,
+                "isSigned": false,
+                "startBit": 0,
+                "offset": 0.0,
+                "factor": 1.0,
+                "length": 64,
+                "name": "Longitude"
+            }
+			},
+        {
+            "fullyQualifiedName": "TestVehicle.Exterior.AirTemperature",
+            "type": "CAN_SIGNAL",
+            "interfaceId": "1",
+            "canSignal": {
+                "messageId": 200,
+                "isBigEndian": false,
+                "isSigned": false,
+                "startBit": 0,
+                "offset": 0.0,
+                "factor": 1.0,
+                "length": 24,
+                "name": "OATICSigNew"
+            }
+        },
+        {
+            "fullyQualifiedName": "TestVehicle.OBD.EngineSpeed",
+            "type": "CAN_SIGNAL",
+            "interfaceId": "1",
+            "canSignal": {
+                "messageId": 101,
+                "isBigEndian": false,
+                "isSigned": false,
+                "startBit": 0,
+                "offset": 0.0,
+                "factor": 1.0,
+                "length": 32,
+                "name": "EngSpd"
+            }
+			},
+        {
+            "fullyQualifiedName": "TestVehicle.Powertrain.CombustionEngine.IsRunning",
+            "type": "CAN_SIGNAL",
+            "interfaceId": "1",
+            "canSignal": {
+                "messageId": 302,
+                "isBigEndian": false,
+                "isSigned": false,
+                "startBit": 0,
+                "offset": 0.0,
+                "factor": 1.0,
+                "length": 24,
+                "name": "PowerModeState"
+            }
+        },
+        {
+            "fullyQualifiedName": "TestVehicle.Powertrain.CombustionEngine.Torque",
+            "type": "CAN_SIGNAL",
+            "interfaceId": "1",
+            "canSignal": {
+                "messageId": 201,
+                "isBigEndian": false,
+                "isSigned": false,
+                "startBit": 0,
+                "offset": 0.0,
+                "factor": 1.0,
+                "length": 32,
+                "name": "EngTrqMe"
+            }
+			},
+        {
+            "fullyQualifiedName": "TestVehicle.Powertrain.TractionBattery.Charging.ChargeType",
+            "type": "CAN_SIGNAL",
+            "interfaceId": "1",
+            "canSignal": {
+                "messageId": 501,
+                "isBigEndian": false,
+                "isSigned": false,
+                "startBit": 0,
+                "offset": 0.0,
+                "factor": 1.0,
+                "length": 24,
+                "name": "HvChargeType_VCAN"
+            }
+        },
+        {
+            "fullyQualifiedName": "TestVehicle.Powertrain.TractionBattery.Charging.IsCharging",
+            "type": "CAN_SIGNAL",
+            "interfaceId": "1",
+            "canSignal": {
+                "messageId": 402,
+                "isBigEndian": false,
+                "isSigned": false,
+                "startBit": 0,
+                "offset": 0.0,
+                "factor": 1.0,
+                "length": 24,
+                "name": "HvChargingState_VCAN"
+            }
+			},
+        {
+            "fullyQualifiedName": "TestVehicle.Powertrain.TractionBattery.Charging.IsDischarging",
+            "type": "CAN_SIGNAL",
+            "interfaceId": "1",
+            "canSignal": {
+                "messageId": 500,
+                "isBigEndian": false,
+                "isSigned": false,
+                "startBit": 0,
+                "offset": 0.0,
+                "factor": 1.0,
+                "length": 24,
+                "name": "HvBattDischargingState"
+            }
+        },
+        {
+            "fullyQualifiedName": "TestVehicle.Powertrain.TractionBattery.StateOfCharge.Displayed",
+            "type": "CAN_SIGNAL",
+            "interfaceId": "1",
+            "canSignal": {
+                "messageId": 400,
+                "isBigEndian": false,
+                "isSigned": false,
+                "startBit": 0,
+                "offset": 0.0,
+                "factor": 1.0,
+                "length": 24,
+                "name": "HVBattSoCPercen_VCAN"
+            }
+			},
+        {
+            "fullyQualifiedName": "TestVehicle.Powertrain.TractionBattery.StateOfHealth",
+            "type": "CAN_SIGNAL",
+            "interfaceId": "1",
+            "canSignal": {
+                "messageId": 401,
+                "isBigEndian": false,
+                "isSigned": false,
+                "startBit": 0,
+                "offset": 0.0,
+                "factor": 1.0,
+                "length": 24,
+                "name": "HvBattSoh"
+            }
+        },
+        {
+            "fullyQualifiedName": "TestVehicle.Powertrain.Transmission.CurrentGear",
+            "type": "CAN_SIGNAL",
+            "interfaceId": "1",
+            "canSignal": {
+                "messageId": 300,
+                "isBigEndian": false,
+                "isSigned": false,
+                "startBit": 0,
+                "offset": 0.0,
+                "factor": 1.0,
+                "length": 24,
+                "name": "CurrGearEms"
+            }
+			},
+        {
+            "fullyQualifiedName": "TestVehicle.Speed",
+            "type": "CAN_SIGNAL",
+            "interfaceId": "1",
+            "canSignal": {
+                "messageId": 100,
+                "isBigEndian": false,
+                "isSigned": false,
+                "startBit": 0,
+                "offset": 0.0,
+                "factor": 1.0,
+                "length": 32,
+                "name": "VehSpdIC"
+            }
+        },
+        {
+            "fullyQualifiedName": "TestVehicle.TraveledDistance",
+            "type": "CAN_SIGNAL",
+            "interfaceId": "1",
+            "canSignal": {
+                "messageId": 301,
+                "isBigEndian": false,
+                "isSigned": false,
+                "startBit": 0,
+                "offset": 0.0,
+                "factor": 1.0,
+                "length": 64,
+                "name": "OdoICFullSigPeriodic"
+            }
+			},
+        {
+            "fullyQualifiedName": "TestVehicle.TripDuration",
+            "type": "CAN_SIGNAL",
+            "interfaceId": "1",
+            "canSignal": {
+                "messageId": 502,
+                "isBigEndian": false,
+                "isSigned": false,
+                "startBit": 0,
+                "offset": 0.0,
+                "factor": 1.0,
+                "length": 64,
+                "name": "TripDuration_CurrentTrip"
+            }
+        },
+        {
+            "fullyQualifiedName": "TestVehicle.TripMeterReading",
+            "type": "CAN_SIGNAL",
+            "interfaceId": "1",
+            "canSignal": {
+                "messageId": 600,
+                "isBigEndian": false,
+                "isSigned": false,
+                "startBit": 0,
+                "offset": 0.0,
+                "factor": 1.0,
+                "length": 32,
+                "name": "TripDistance_CurrentTrip"
+            }
+			}
+    ]
+  }
+
+
+
+}
+

@@ -1,0 +1,16 @@
+roles:
+- app_name: esync-role
+  policy:
+  - allowed_actions:
+    - "kms:Encrypt"
+    - "kms:Decrypt"
+    - "kms:GenerateDataKey"
+    - "kms:CreateGrant"
+    - "secretsmanager:GetSecretValue"
+    resources:
+    - "*"
+  - allowed_actions:
+    - "iotjobsdata:StartCommandExecution"
+    resources:
+    - "arn:aws:iot:*:905418263290:thing/*"
+    - "arn:aws:iot:*:905418263290:command/*"
