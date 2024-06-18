@@ -1,0 +1,207 @@
+{
+    "name": "FleetWiseWorkshopDecoder01",
+    "modelManifestArn": "arn:aws:iotfleetwise:eu-central-1:848831280637:model-manifest/FleetWiseWorkshopModel01",
+    "description": "AWS IoT FleetWise Training Decoder Manifest",
+    "networkInterfaces": [
+      {
+        "canInterface": {
+          "name": "vcan0",
+          "protocolName": "CAN",
+          "protocolVersion": "2.0b"
+        },
+        "interfaceId": "1",
+        "type": "CAN_INTERFACE"
+      }
+    ],
+  
+    "signalDecoders": [
+      {
+        "canSignal": {
+          "factor": 0.5,
+          "isBigEndian": false,
+          "isSigned": false,
+          "length": 24,
+          "messageId": 100,
+          "offset": 0.0,
+          "startBit": 0
+        },
+        "fullyQualifiedName": "ActualVehicleSpeed",
+        "interfaceId": "1",
+        "type": "CAN_SIGNAL"
+      },
+  
+      {
+        "canSignal": {
+          "factor": 0.25,
+          "isBigEndian": false,
+          "isSigned": false,
+          "length": 24,
+          "messageId": 201,
+          "offset": -100.0,
+          "startBit": 0
+        },
+        "fullyQualifiedName": "BrakePedalPressure",
+        "interfaceId": "1",
+        "type": "CAN_SIGNAL"
+      },
+      {
+        "canSignal": {
+          "factor": 0.25,
+          "isBigEndian": false,
+          "isSigned": false,
+          "length": 24,
+          "messageId": 202,
+          "offset": -100.0,
+          "startBit": 0
+        },
+        "fullyQualifiedName": "BatteryChargeLevel",
+        "interfaceId": "1",
+        "type": "CAN_SIGNAL"
+      },
+  
+      {
+        "canSignal": {
+          "factor": 0.5,
+          "isBigEndian": false,
+          "isSigned": false,
+          "length": 24,
+          "messageId": 301,
+          "offset": -40.0,
+          "startBit": 0
+        },
+        "fullyQualifiedName": "BatteryPack01CellTemperature",
+        "interfaceId": "1",
+        "type": "CAN_SIGNAL"
+      },
+  
+      {
+        "canSignal": {
+          "factor": 1,
+          "isBigEndian": false,
+          "isSigned": false,
+          "length": 24,
+          "messageId": 500,
+          "offset": 0.0,
+          "startBit": 0
+        },
+        "fullyQualifiedName": "DriverSeatbeltStatus",
+        "interfaceId": "1",
+        "type": "CAN_SIGNAL"
+      },
+  
+      {
+        "canSignal": {
+          "factor": 1,
+          "isBigEndian": false,
+          "isSigned": false,
+          "length": 24,
+          "messageId": 501,
+          "offset": 0.0,
+          "startBit": 0
+        },
+        "fullyQualifiedName": "OutsideAirTemperature",
+        "interfaceId": "1",
+        "type": "CAN_SIGNAL"
+      },
+  
+      {
+        "canSignal": {
+          "factor": 0.01,
+          "isBigEndian": false,
+          "isSigned": false,
+          "length": 24,
+          "messageId": 600,
+          "offset": 0.0,
+          "startBit": 0
+        },
+        "fullyQualifiedName": "TirePressure.TirePressureFL",
+        "interfaceId": "1",
+        "type": "CAN_SIGNAL"
+      },
+      {
+        "canSignal": {
+          "factor": 0.01,
+          "isBigEndian": false,
+          "isSigned": false,
+          "length": 24,
+          "messageId": 601,
+          "offset": 0.0,
+          "startBit": 0
+        },
+        "fullyQualifiedName": "TirePressure.TirePressureFR",
+        "interfaceId": "1",
+        "type": "CAN_SIGNAL"
+      },
+      {
+        "canSignal": {
+          "factor": 1,
+          "isBigEndian": false,
+          "isSigned": false,
+          "length": 24,
+          "messageId": 602,
+          "offset": 0.0,
+          "startBit": 0
+        },
+        "fullyQualifiedName": "TirePressure.TirePressureRL",
+        "interfaceId": "1",
+        "type": "CAN_SIGNAL"
+      },
+      {
+        "canSignal": {
+          "factor": 1,
+          "isBigEndian": false,
+          "isSigned": false,
+          "length": 24,
+          "messageId": 603,
+          "offset": 0.0,
+          "startBit": 0
+        },
+        "fullyQualifiedName": "TirePressure.TirePressureRR",
+        "interfaceId": "1",
+        "type": "CAN_SIGNAL"
+      },
+      {
+        "canSignal": {
+          "factor": 1,
+          "isBigEndian": false,
+          "isSigned": false,
+          "length": 24,
+          "messageId": 604,
+          "offset": 0.0,
+          "startBit": 0
+        },
+        "fullyQualifiedName": "VehicleStatus",
+        "interfaceId": "1",
+        "type": "CAN_SIGNAL"
+      },
+      {
+        "canSignal": {
+          "factor": 1,
+          "isBigEndian": false,
+          "isSigned": false,
+          "length": 24,
+          "messageId": 605,
+          "offset": 0.0,
+          "startBit": 0
+        },
+        "fullyQualifiedName": "BatteryPackVoltage",
+        "interfaceId": "1",
+        "type": "CAN_SIGNAL"
+      },
+      {
+        "canSignal": {
+          "factor": 1,
+          "isBigEndian": false,
+          "isSigned": false,
+          "length": 24,
+          "messageId": 606,
+          "offset": 0.0,
+          "startBit": 0
+        },
+        "fullyQualifiedName": "BatteryPackCurrent",
+        "interfaceId": "1",
+        "type": "CAN_SIGNAL"
+      }
+    ]
+  }
+  

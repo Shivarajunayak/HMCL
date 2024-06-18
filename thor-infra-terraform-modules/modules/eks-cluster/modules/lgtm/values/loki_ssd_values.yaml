@@ -1,0 +1,168 @@
+loki:
+  auth_enabled: false
+  storage:
+    bucketNames:
+      chunks: ${bucketname}
+      ruler: ${bucketname}
+      admin: ${bucketname}
+    type: s3
+    s3:
+      region: ${region}
+      bucketnames: ${bucketname}
+      s3forcepathstyle: false
+      s3ForcePathStyle: false
+      insecure: false
+  env:
+  - name: MY_POD_IP
+    valueFrom:
+      fieldRef:
+        fieldPath: status.podIP
+  memberlist:
+    bind_addr:
+    - $${MY_POD_IP}
+  schema_config:
+    configs:
+    - from: "2020-05-15"
+      store: boltdb-shipper
+      object_store: s3
+      schema: v11
+      index:
+        period: 24h
+        prefix: loki_index_
+
+  querier:
+    query_timeout: 5m
+    engine:
+      timeout: 5m
+    max_concurrent: 50
+  server:
+    grpc_server_max_recv_msg_size: 52428800
+    http_server_read_timeout: 300s
+    http_server_write_timeout: 300s
+
+  query_scheduler:
+    max_outstanding_requests_per_tenant: 4096
+  frontend:
+    max_outstanding_per_tenant: 4096
+  query_range:
+    parallelise_shardable_queries: true
+  limits_config:
+    query_timeout: 5m
+    split_queries_by_interval: 15m
+    max_query_parallelism: 3500
+    max_query_series: 50000
+
+serviceAccount:
+  create: true
+  name: ${sa_name}
+  imagePullSecrets: []
+  labels: {}
+  annotations:
+    eks.amazonaws.com/role-arn: "${irsa_arn}"
+  automountServiceAccountToken: true
+
+write:
+  affinity: {}
+  persistence:
+    enableStatefulSetAutoDeletePVC: true
+    storageClass: openebs-hostpath-xfs
+    size: 100Gi
+  resources:
+    requests:
+      cpu: 500m
+      memory: 1Gi
+    limits:
+      cpu: 1
+      memory: 2Gi
+  autoscaling:
+    enabled: true
+    minReplicas: 3
+    maxReplicas: 10
+  nodeSelector:
+    large: "true"
+
+read:
+  affinity: {}
+  resources:
+    requests:
+      cpu: 500m
+      memory: 1Gi
+    limits:
+      cpu: 1
+      memory: 2Gi
+  autoscaling:
+    enabled: true
+    minReplicas: 3
+    maxReplicas: 10
+  tolerations:
+  - operator: "Exists"
+
+backend:
+  affinity: {}
+  persistence:
+    enableStatefulSetAutoDeletePVC: true
+    storageClass: openebs-hostpath-xfs
+    size: 100Gi
+  resources:
+    requests:
+      cpu: 500m
+      memory: 1Gi
+    limits:
+      cpu: 1
+      memory: 2Gi
+  autoscaling:
+    enabled: true
+    minReplicas: 3
+    maxReplicas: 10
+  nodeSelector:
+    large: "true"
+
+gateway:
+  affinity: {}
+  resources:
+    requests:
+      cpu: 500m
+      memory: 1Gi
+    limits:
+      cpu: 1
+      memory: 2Gi
+  autoscaling:
+    enabled: true
+    minReplicas: 3
+    maxReplicas: 10
+  tolerations:
+  - operator: "Exists"
+
+singleBinary:
+  affinity: {}
+  resources:
+    requests:
+      cpu: 500m
+      memory: 1Gi
+    limits:
+      cpu: 1
+      memory: 2Gi
+  autoscaling:
+    enabled: true
+    minReplicas: 3
+    maxReplicas: 10
+  tolerations:
+  - operator: "Exists"
+
+monitoring:
+  lokiCanary:
+    tolerations:
+    - operator: "Exists"
+
+tableManager:
+  tolerations:
+  - operator: "Exists"
+
+sidecar:
+  resources:
+    requests:
+      cpu: 500m
+      memory: 1Gi
+    limits:
+      cpu: 1
+      memory: 2Gi

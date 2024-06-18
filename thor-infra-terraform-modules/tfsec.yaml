@@ -1,0 +1,29 @@
+---
+exclude:
+  - aws-lambda-enable-tracing
+  - aws-ec2-require-vpc-flow-logs-for-all-vpcs
+  - aws-ec2-no-excessive-port-access
+  - aws-ec2-no-public-ingress-acl
+  - aws-ec2-no-public-egress-sgr
+  - aws-eks-no-public-cluster-access
+  - aws-eks-no-public-cluster-access-to-cidr
+  - aws-eks-encrypt-secrets
+  - aws-iam-no-policy-wildcards
+  - aws-eks-enable-control-plane-logging
+  - aws-ec2-add-description-to-security-group
+  - aws-ec2-add-description-to-security-group-rule
+  - aws-ec2-enforce-launch-config-http-token-imds
+  - aws-msk-enable-in-transit-encryption
+  - aws-cloudwatch-log-group-customer-key
+  - aws-msk-enable-logging
+  - aws-s3-enable-bucket-encryption
+  - aws-s3-enable-bucket-logging
+  - aws-s3-enable-versioning
+  - aws-s3-encryption-customer-key
+  - aws-elb-alb-not-public
+  - aws-elb-drop-invalid-headers
+  - aws-s3-block-public-acls
+  - aws-s3-block-public-policy
+  - aws-s3-ignore-public-acls
+  - aws-s3-no-public-buckets
+  - aws-s3-specify-public-access-block

@@ -1,0 +1,29 @@
+---
+apiVersion: secrets-store.csi.x-k8s.io/v1
+kind: SecretProviderClass
+metadata:
+  name: hmcl-cv-azure-agent-spc
+  namespace: azure-agent
+spec:
+  provider: aws
+  secretObjects:
+  - data:
+    - key: AZP_URL
+      objectName: "AZP_URL"
+    - key: AZP_POOL
+      objectName: "AZP_POOL"
+    - key: AZP_TOKEN
+      objectName: "AZP_TOKEN"
+    secretName: azure-agent-secret
+    type: Opaque
+  parameters:
+    objects: |
+        - objectName: "${azure_agent_aws_secret_name}"
+          objectType: "secretsmanager"
+          jmesPath:
+            - path: "AZP_URL"
+              objectAlias: "AZP_URL"
+            - path: "AZP_POOL"
+              objectAlias: "AZP_POOL"
+            - path: "AZP_TOKEN"
+              objectAlias: "AZP_TOKEN"

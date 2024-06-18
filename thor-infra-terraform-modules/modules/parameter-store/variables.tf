@@ -1,0 +1,3 @@
+variable "parameters" {
+  type = any
+}

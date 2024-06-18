@@ -1,0 +1,8 @@
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  annotations:
+    eks.amazonaws.com/role-arn: "${azure_agent_irsa_role_arn}" 
+  name: azure-agent-sa
+  namespace: azure-agent

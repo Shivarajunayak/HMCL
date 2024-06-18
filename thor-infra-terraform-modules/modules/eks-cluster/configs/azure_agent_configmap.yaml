@@ -1,0 +1,16 @@
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: awsconfig-configmap
+  namespace: azure-agent
+data:
+  config: |
+     [profile mgt-env]
+     role_arn = arn:aws:iam::<mgt-account-id>:role/<role-name>
+     web_identity_token_file = /var/run/secrets/eks.amazonaws.com/serviceaccount/token
+
+     [profile dev-env]
+     role_arn = <arn-role>
+     source_profile = mgt-env
+     role_session_name = xactarget

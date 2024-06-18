@@ -1,0 +1,26 @@
+# Node Template
+apiVersion: karpenter.k8s.aws/v1beta1
+kind: EC2NodeClass
+metadata:
+  name: default
+spec:
+  role: "${karpenter_node_instance_role}"
+  amiFamily: "AL2"
+  subnetSelectorTerms:
+  - tags:
+      Name: "${karpenter_shared_subnet_tag_regex}"
+  - tags:
+      Name: "${karpenter_back_subnet_tag_regex}"
+  securityGroupSelectorTerms:
+  - tags:
+      aws:eks:cluster-name: "${cluster_name}"
+  tags:
+    Name: "${cluster_name}-karpenter-node"
+    IntentLabel: "apps"
+  userData: |
+    ${karpenter_userdata}
+  blockDeviceMappings:
+    - deviceName: /dev/xvda
+      ebs:
+        volumeSize: "${karpenter_node_root_vol_size}"
+        volumeType: gp3

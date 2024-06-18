@@ -1,0 +1,10 @@
+apiVersion: keda.sh/v1alpha1
+kind: TriggerAuthentication
+metadata:
+  name: pipeline-trigger-auth
+  namespace: azure-agent
+spec:
+  secretTargetRef:
+    - parameter: AZP_TOKEN
+      name: azure-agent-secret
+      key: AZP_TOKEN

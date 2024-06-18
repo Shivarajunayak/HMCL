@@ -1,0 +1,9 @@
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: docker-config
+  namespace: azure-agent
+data:
+  config.json: |
+    {"credsStore":"ecr-login","credHelpers":{"${image_push_account_id}.dkr.ecr.${image_push_region}.amazonaws.com":"ecr-login"}}

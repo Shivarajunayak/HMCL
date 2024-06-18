@@ -1,0 +1,118 @@
+{    
+    "name": "test1",
+    "description": "",
+    "signalCatalogArn": "arn:aws:iotfleetwise:us-west-2:905418263290:signal-catalog/fwdemo-someip-0123b405-signal-catalog",
+    "targetArn": "arn:aws:iotfleetwise:us-west-2:905418263290:fleet/fwsim-iot-fw-simulator-fleet",
+    "collectionScheme": {
+        "timeBasedCollectionScheme": {
+            "periodMs": 10000
+        }
+    },
+    "compression": "OFF",
+    "diagnosticsMode": "OFF",
+    "postTriggerCollectionDuration": 0,
+    "priority": 0,
+    "signalsToCollect": [
+        {
+            "name": "TestVehicle.Chassis.Accelerator.PedalPosition",
+            "maxSampleCount": 1,
+            "minimumSamplingIntervalMs": 0
+        },
+        {
+            "name": "TestVehicle.Chassis.Brake.PedalPosition",
+            "maxSampleCount": 1,
+            "minimumSamplingIntervalMs": 0
+        },
+        {
+            "name": "TestVehicle.CurrentLocation.Latitude",
+            "maxSampleCount": 1,
+            "minimumSamplingIntervalMs": 0
+        },
+		{
+            "name": "TestVehicle.CurrentLocation.Longitude",
+            "maxSampleCount": 1,
+            "minimumSamplingIntervalMs": 0
+        },
+        {
+            "name": "TestVehicle.Exterior.AirTemperature",
+            "maxSampleCount": 1,
+            "minimumSamplingIntervalMs": 0
+        },
+        {
+            "name": "TestVehicle.OBD.EngineSpeed",
+            "maxSampleCount": 1,
+            "minimumSamplingIntervalMs": 0
+        },
+        {
+            "name": "TestVehicle.Powertrain.CombustionEngine.IsRunning",
+            "maxSampleCount": 1,
+            "minimumSamplingIntervalMs": 0
+        },
+        {
+            "name": "TestVehicle.Powertrain.CombustionEngine.Torque",
+            "maxSampleCount": 1,
+            "minimumSamplingIntervalMs": 0
+        },
+        {
+            "name": "TestVehicle.Powertrain.TractionBattery.Charging.ChargeType",
+			"maxSampleCount": 1,
+            "minimumSamplingIntervalMs": 0
+        },
+        {
+            "name": "TestVehicle.Powertrain.TractionBattery.Charging.IsCharging",
+            "maxSampleCount": 1,
+            "minimumSamplingIntervalMs": 0
+        },
+        {
+            "name": "TestVehicle.Powertrain.TractionBattery.Charging.IsDischarging",
+            "maxSampleCount": 1,
+            "minimumSamplingIntervalMs": 0
+        },
+        {
+            "name": "TestVehicle.Powertrain.TractionBattery.StateOfCharge.Displayed",
+            "maxSampleCount": 1,
+            "minimumSamplingIntervalMs": 0
+        },
+        {
+            "name": "TestVehicle.Powertrain.TractionBattery.StateOfHealth",
+            "maxSampleCount": 1,
+            "minimumSamplingIntervalMs": 0
+        },
+        {
+            "name": "TestVehicle.Powertrain.Transmission.CurrentGear",
+            "maxSampleCount": 1,
+            "minimumSamplingIntervalMs": 0
+        },
+        {
+            "name": "TestVehicle.Speed",
+			"maxSampleCount": 1,
+            "minimumSamplingIntervalMs": 0
+        },
+        {
+            "name": "TestVehicle.TraveledDistance",
+            "maxSampleCount": 1,
+            "minimumSamplingIntervalMs": 0
+        },
+        {
+            "name": "TestVehicle.TripDuration",
+            "maxSampleCount": 1,
+            "minimumSamplingIntervalMs": 0
+        },
+        {
+            "name": "TestVehicle.TripMeterReading",
+            "maxSampleCount": 1,
+            "minimumSamplingIntervalMs": 0
+        }
+    ],
+    "spoolingMode": "OFF",
+    "dataDestinationConfigs": [
+        {
+            "s3Config": {
+                "bucketArn": "arn:aws:s3:::fwsim-iot-fw-simulator-bucket-oigtgaft",
+                "dataFormat": "PARQUET",
+                "storageCompressionFormat": "GZIP",
+                "prefix": "fleetwise/DEMO_S3"
+            }
+        }
+    ]
+}
