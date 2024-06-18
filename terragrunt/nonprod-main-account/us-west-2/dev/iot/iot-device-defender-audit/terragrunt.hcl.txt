@@ -16,7 +16,7 @@ include "root" {
 # environment at a time (e.g., qa -> stage -> prod).
 
 terraform {
-  source = "git@ssh.dev.azure.com:v3/hero-ev-team/CVPI%20-%20Thor%20Infra%20DevOps/thor-infra-terraform-modules//modules/iot/iot-things?ref=feature_iot"
+  source = "git@ssh.dev.azure.com:v3/hero-ev-team/CVPI%20-%20Thor%20Infra%20DevOps/thor-infra-terraform-modules//modules/iot/iot-device-defender-audit?ref=feature_iot"
 
 }
 
@@ -46,36 +46,10 @@ locals {
 
 inputs = {
 
-  things = [
-    {
-      name             = "HMCL-MPARITOS-TEST-2"
-      attribute_keys   = ["TenantId", "VirtualId"]
-      attribute_values = ["EV", "fc05920a-920a-45920ae60e-85920ae60e67f-67f107"]
-      tags             = { environment = "dev", project = "iot" }
-    },
-    {
-      name             = "HMCL-MPARITOS-TEST-1"
-      attribute_keys   = ["First", "Second"]
-      attribute_values = ["value3", "value4"]
-      tags             = { environment = "prod", project = "iot" }
-    }
-  ]
-  thing_groups = [
-    {
-      name             = "EV-hmcl-cvp-device-provisioning"
-      attribute_keys   = []
-      attribute_values = []
-      description      = "This is my first thing group"
-      tags             = { terraform = "true" }
-    },
-    {
-      name             = "EV-hmcl-cvp-device-provisioning-by-ASL"
-      attribute_keys   = []
-      attribute_values = []
-      description      = "This is my second thing group"
-      tags             = { terraform = "true" }
-    }
-  ]
+account_id        = "123456789012"
+iot_role_arn      = "arn:aws:iam::123456789012:role/YourIoTRole"
+sns_role_arn      = "arn:aws:iam::123456789012:role/YourSNSTopicRole"
+sns_target_arn    = "arn:aws:sns:us-east-1:123456789012:YourSNSTopic"
 
 }
 

@@ -16,8 +16,7 @@ include "root" {
 # environment at a time (e.g., qa -> stage -> prod).
 
 terraform {
-  source = "git@ssh.dev.azure.com:v3/hero-ev-team/CVPI%20-%20Thor%20Infra%20DevOps/thor-infra-terraform-modules//modules/iot/iot-things?ref=feature_iot"
-
+  source = "git@ssh.dev.azure.com:v3/hero-ev-team/CVPI%20-%20Thor%20Infra%20DevOps/thor-infra-terraform-modules//modules/iot/iot-lks?ref=feature_iot"
 }
 
 locals {
@@ -31,6 +30,7 @@ locals {
   environment_vars = read_terragrunt_config(find_in_parent_folders("env.hcl"))
 
 
+
   # Extract the variables we need for easy access
 
   aws_account_id   = local.account_vars.locals.aws_account_id
@@ -40,45 +40,20 @@ locals {
   sso_region       = local.region_vars.locals.sso_region
   deployment_role  = local.account_vars.locals.deployment_role
   environment      = local.environment_vars.locals.environment
+
 }
+
 
 # Inputs to the source Terraform module
 
 inputs = {
 
-  things = [
-    {
-      name             = "HMCL-MPARITOS-TEST-2"
-      attribute_keys   = ["TenantId", "VirtualId"]
-      attribute_values = ["EV", "fc05920a-920a-45920ae60e-85920ae60e67f-67f107"]
-      tags             = { environment = "dev", project = "iot" }
-    },
-    {
-      name             = "HMCL-MPARITOS-TEST-1"
-      attribute_keys   = ["First", "Second"]
-      attribute_values = ["value3", "value4"]
-      tags             = { environment = "prod", project = "iot" }
-    }
-  ]
-  thing_groups = [
-    {
-      name             = "EV-hmcl-cvp-device-provisioning"
-      attribute_keys   = []
-      attribute_values = []
-      description      = "This is my first thing group"
-      tags             = { terraform = "true" }
-    },
-    {
-      name             = "EV-hmcl-cvp-device-provisioning-by-ASL"
-      attribute_keys   = []
-      attribute_values = []
-      description      = "This is my second thing group"
-      tags             = { terraform = "true" }
-    }
-  ]
+  fleetwise_endpoint_url = "https://controlplane.us-west-2.gamma.kaleidoscope.iot.aws.dev"
+  aws_region             = "${local.aws_region}"
+  terraform_role_arn     = "arn:aws:iam::${local.aws_account_id}:role/${local.deployment_role}"
+  lks_template_name      = "fwdemo-lks-template"
+  state_template_properties = ["Vehicle.ABS.DemoBrakePedalPressure", "Vehicle.ECM.DemoEngineTorque"]
+  signal_catalog_arn     = "arn:aws:iotfleetwise:us-west-2:905418263290:signal-catalog/fwdemo-someip-0123b405-signal-catalog"
 
 }
-
-
-
 

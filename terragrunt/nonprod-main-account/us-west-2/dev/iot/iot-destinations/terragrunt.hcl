@@ -45,7 +45,7 @@ locals {
 # Inputs to the source Terraform module
 
 inputs = {
-  role_name          = "hmcl-cv-${local.environment}-destinations-iot-policy"
+  role_name          = "hmcl-cv-${local.environment}-destinations-iot-role"
   assume_role_policy = <<EOF
 {
   "Version": "2012-10-17",
@@ -60,6 +60,7 @@ inputs = {
   ]
 }
 EOF
+  iam_policy_name    = "hmcl-cv-${local.environment}-destinations-iot-policy"
   iot_destinations_custom_policy_json = jsonencode({
     "Version" : "2012-10-17",
     "Statement" : [
@@ -68,15 +69,40 @@ EOF
         "Action" : [
           "ec2:CreateNetworkInterface",
           "ec2:DescribeNetworkInterfaces",
-          "ec2:DescribeSecurityGroups",
+          "ec2:DescribeVpcs",
+          "ec2:DeleteNetworkInterface",
           "ec2:DescribeSubnets",
-          "ec2:DescribeVpcs"
+          "ec2:DescribeVpcAttribute",
+          "ec2:DescribeSecurityGroups"
         ],
         "Resource" : "*"
+      },
+      {
+        "Effect" : "Allow",
+        "Action" : "ec2:CreateNetworkInterfacePermission",
+        "Resource" : "*",
+        "Condition" : {
+          "StringEquals" : {
+            "ec2:ResourceTag/VPCDestinationENI" : "true"
+          }
+        }
+      },
+      {
+        "Effect" : "Allow",
+        "Action" : [
+          "ec2:CreateTags"
+        ],
+        "Resource" : "*",
+        "Condition" : {
+          "StringEquals" : {
+            "ec2:CreateAction" : "CreateNetworkInterface",
+            "aws:RequestTag/VPCDestinationENI" : "true"
+          }
+        }
       }
     ]
   })
-  security_group_id = dependency.sg.outputs.all_security_group_ids.flink_sg
+  security_group_id = dependency.sg.outputs.all_security_group_ids.msk_sg
   subnet_ids        = ["subnet-09ca830d19eec175d", "subnet-0b6740a481f50a6a6"]
   vpc_id            = "vpc-00038ad12d3dd001f"
 
